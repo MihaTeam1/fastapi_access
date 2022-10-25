@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fastapi_access"
+description = "Access control package for FastAPI framework"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "MIT"
+authors = [
+    { name = "Michail Sorokin"},
+]
+
+classifiers = [
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Topic :: Internet",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+    "Development Status :: 1 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+
+dependencies = [
+    "fastapi"
+]
+
+[project.optional-dependencies]
+test = [
+
+]
+
+[project.urls]
+Homepage = "https://github.com/mihateam1/fastapi_access"
+
+[tool.hatch.version]
+path = "fastapi_access/__init__.py"
+
+[tool.mypy]
+strict = true
