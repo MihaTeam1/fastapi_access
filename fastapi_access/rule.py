@@ -26,7 +26,7 @@ class Rule:
         if callable(self.__second_value):
             second_value = self.__second_value(initial_subject)
         if not second_value:
-            return bool(first_value)
+            return first_value
         return self.__operation(first_value, second_value)
 
     @staticmethod
