@@ -28,7 +28,7 @@ Setting source for getting information
 
 Allowed to use Fastapi Dependency stack
 ```python
-AccessControl.set_access_data_func(get_test_data)
+AccessControl.set_access_data_func(get_current_user)
 ```
 ____
 Supported operation types
