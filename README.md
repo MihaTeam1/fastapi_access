@@ -13,7 +13,7 @@ def get_current_user():
     }
 
 app = FastAPI()
-AccessControl.set_access_data_func(get_current_user)
+AccessControl.set_access_data_func(app, get_current_user)
 
 @app.get('/path', dependencies=[Depends(AccessControl(
     (Rule('username') == 'test')
@@ -28,7 +28,7 @@ Setting source for getting information
 
 Allowed to use Fastapi Dependency stack
 ```python
-AccessControl.set_access_data_func(get_current_user)
+AccessControl.set_access_data_func(app, get_current_user)
 ```
 ____
 Supported operation types

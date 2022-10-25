@@ -1,20 +1,11 @@
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, FastAPI
 from typing import Optional, Callable
 
 from .rule import Rule
 
 
-class AccessDataProvider:
-    @staticmethod
-    def __call__():
-        pass
-
-    @classmethod
-    def set_access_data_func(cls, new_function):
-        cls.__call__ = staticmethod(new_function)
-
-
-_access_data_provider = AccessDataProvider()
+def get_access_data():
+    pass
 
 
 class AccessControl:
@@ -22,7 +13,7 @@ class AccessControl:
         self.__rules = rules
         self.__message = message or 'Access denied'
 
-    def __call__(self, data: dict = Depends(_access_data_provider)):
+    def __call__(self, data: dict = Depends(get_access_data)):
         if not self.__rules(data):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -32,7 +23,7 @@ class AccessControl:
             )
 
     @staticmethod
-    def set_access_data_func(new_function: Callable) -> None:
-        _access_data_provider.set_access_data_func(new_function)
+    def set_access_data_func(app: FastAPI, new_function: Callable) -> None:
+        app.dependency_overrides[get_access_data] = new_function
 
 
