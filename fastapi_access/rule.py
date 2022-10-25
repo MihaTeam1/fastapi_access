@@ -6,27 +6,31 @@ from .types import Operator
 class Rule:
     def __init__(
             self,
-            attr_path: Optional[str | List[str]],
-            __operation: Optional[Operation] = None
+            attr_path: str | List[str],
+            first_value: Optional[Any] = None,
+            operation: Optional[Operation] = None,
+            second_value: Optional[Any] = None
     ):
         self.__attr_path = attr_path
-        self.__operation = __operation
-        self.__rules_operation = False
-        self.__main_rule = self
+        self.__first_value = first_value
+        self.__operation = operation
+        self.__second_value = second_value
 
-    def __call__(self, subject):
-        if self.__rules_operation:
-            result = self.__operation(
-                subject,
-                self.__main_rule,
-            )
+    def __call__(self, initial_subject):
+        first_value = self.__first_value
+        second_value = self.__second_value
+        if callable(self.__first_value):
+            first_value = self.__first_value(initial_subject)
         else:
-            result = self.__operation(self.__get_subject_value(subject))
-        return result
+            first_value = self.__get_subject_value(initial_subject)
+        if callable(self.__second_value):
+            second_value = self.__second_value(initial_subject)
+        if not second_value:
+            return bool(first_value)
+        return self.__operation(first_value, second_value)
 
     @staticmethod
     def __get_subject_attr(subject, path):
-        subject = subject.copy()
         if isinstance(subject, dict):
             subject = subject.get(path, None)
         else:
@@ -34,7 +38,6 @@ class Rule:
         return subject
 
     def __get_subject_value(self, subject):
-        subject = subject.copy()
         if type(self.__attr_path) is list:
             for path in self.__attr_path:
                 subject = self.__get_subject_attr(subject, path)
@@ -46,17 +49,17 @@ class Rule:
 
     def __set_operation(self, operation: Tuple[Operator, Any]):
         if isinstance(operation[1], Rule):
-            self.__rules_operation = True
-            self.__main_rule = Rule(
+            self.__first_value = Rule(
                 attr_path=self.__attr_path,
-                __operation=self.__operation
+                first_value=self.__first_value,
+                operation=self.__operation,
+                second_value=self.__second_value
             )
+            self.__attr_path = ''
         elif self.__operation:
             raise ValueError('You cannot set more than one operation to rule')
-        self.__operation = Operation(
-            operation_type=operation[0],
-            operation_value=operation[1],
-        )
+        self.__operation = Operation(operation[0])
+        self.__second_value = operation[1]
 
     def __and__(self, other):
         self.__set_operation((Operator.AND, other))
@@ -94,6 +97,14 @@ class Rule:
         self.__set_operation((Operator.CONTAINS, item))
         return self
 
+    def not_contains(self, item):
+        self.__set_operation((Operator.NOT_CONTAINS, item))
+        return self
+
     def in_(self, item: Any | List[Any]):
         self.__set_operation((Operator.IN, item))
+        return self
+
+    def not_in_(self, item: Any | List[Any]):
+        self.__set_operation((Operator.NOT_IN, item))
         return self
