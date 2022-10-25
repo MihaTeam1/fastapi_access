@@ -1,6 +1,7 @@
 /Pipfile.lock
 /Pipfile
 /.venv/
+dist
 .DS_Store
 .idea
 __pycache__/

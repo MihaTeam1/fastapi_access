@@ -61,50 +61,50 @@ class Rule:
         self.__operation = Operation(operation[0])
         self.__second_value = operation[1]
 
-    def __and__(self, other):
+    def __and__(self, other) -> 'Rule':
         self.__set_operation((Operator.AND, other))
         return self
 
-    def __or__(self, other):
+    def __or__(self, other) -> 'Rule':
         self.__set_operation((Operator.OR, other))
         return self
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> 'Rule':
         self.__set_operation((Operator.EQUAL, other))
         return self
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> 'Rule':
         self.__set_operation((Operator.NOT_EQUAL, other))
         return self
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> 'Rule':
         self.__set_operation((Operator.GREATER, other))
         return self
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> 'Rule':
         self.__set_operation((Operator.LOWER, other))
         return self
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> 'Rule':
         self.__set_operation((Operator.EQ_GREATER, other))
         return self
 
-    def __le__(self, other):
+    def __le__(self, other) -> 'Rule':
         self.__set_operation((Operator.EQ_LOWER, other))
         return self
 
-    def contains(self, item):
+    def contains(self, item) -> 'Rule':
         self.__set_operation((Operator.CONTAINS, item))
         return self
 
-    def not_contains(self, item):
+    def not_contains(self, item) -> 'Rule':
         self.__set_operation((Operator.NOT_CONTAINS, item))
         return self
 
-    def in_(self, item: Any | List[Any]):
+    def in_(self, item: Any | List[Any]) -> 'Rule':
         self.__set_operation((Operator.IN, item))
         return self
 
-    def not_in_(self, item: Any | List[Any]):
+    def not_in_(self, item: Any | List[Any]) -> 'Rule':
         self.__set_operation((Operator.NOT_IN, item))
         return self
