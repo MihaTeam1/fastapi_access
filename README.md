@@ -9,7 +9,11 @@ from fastapi_access import AccessControl, Rule
 def get_current_user():
     return {
         'username': 'test',
-        'job': 'storekeeper'
+        'job': 'storekeeper',
+        'roles': [
+            {'slug': 'admin', 'name': 'some_admin_name'},
+            {'slug': 'staff', 'name': 'some_staff_name'}
+        ]
     }
 
 app = FastAPI()
@@ -58,7 +62,7 @@ rules = (
     | Rule('roles').contains('admin')
     | (
         (Rule('organization_id') == 5)
-        & Rule('roles').contains('staff')
+        & Rule('roles', 'slug').contains('staff')
     )
 )
 ```

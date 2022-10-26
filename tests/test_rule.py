@@ -6,6 +6,10 @@ test_user = {
     'username': 'admin',
     'age': 25,
     'roles': ['admin', 'staff'],
+    'roles_with_names': [
+        {'slug': 'admin', 'name': 'admin_test_name'},
+        {'slug': 'staff', 'name': 'staff_test_name'},
+    ],
     'organization_id': 5,
     'balance': 0,
     'income': 100,
@@ -126,6 +130,27 @@ def test_not_in_true():
 def test_not_in_false():
     rules = Rule('organization_id').not_in_([4,5,6])
     assert not rules(test_user)
+
+
+def test_deep_path_true():
+    rules = Rule('roles_with_names', 'slug').contains('admin')
+    assert rules(test_user)
+    rules = Rule('roles_with_names', 'name').contains('admin_test_name')
+    assert rules(test_user)
+
+
+def test_deep_path_false():
+    rules = Rule('roles_with_names', 'slug').contains('admin_test_name')
+    assert not rules(test_user)
+    rules = Rule('roles_with_names', 'name').contains('admin')
+    assert not rules(test_user)
+
+
+def test_deep_values_list():
+    rules = Rule('roles_with_names', 'slug')
+    assert rules(test_user) == ['admin', 'staff']
+    rules = Rule('roles_with_names', 'name')
+    assert rules(test_user) == ['admin_test_name', 'staff_test_name']
 
 
 def test_and_true():

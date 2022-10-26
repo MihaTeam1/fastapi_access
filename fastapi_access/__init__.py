@@ -1,4 +1,4 @@
-__version__ = "0.1.2.0"
+__version__ = "0.1.3.1"
 
 from .rule import Rule
 from .types import Operator

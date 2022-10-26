@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import List, Any, Tuple, Optional
 from .operation import Operation
 from .types import Operator
@@ -6,60 +7,65 @@ from .types import Operator
 class Rule:
     def __init__(
             self,
-            attr_path: str | List[str],
+            *attr_path: str,
             first_value: Optional[Any] = None,
             operation: Optional[Operation] = None,
             second_value: Optional[Any] = None
     ):
-        self.__attr_path = attr_path
-        self.__first_value = first_value
-        self.__operation = operation
-        self.__second_value = second_value
+        self._attr_path = attr_path
+        self._first_value = first_value
+        self._operation = operation
+        self._second_value = second_value
 
     def __call__(self, initial_subject):
-        first_value = self.__first_value
-        second_value = self.__second_value
-        if callable(self.__first_value):
-            first_value = self.__first_value(initial_subject)
+        first_value = self._first_value
+        second_value = self._second_value
+        if callable(first_value):
+            first_value = first_value(initial_subject)
         else:
             first_value = self.__get_subject_value(initial_subject)
-        if callable(self.__second_value):
-            second_value = self.__second_value(initial_subject)
-        if not second_value:
+        if callable(second_value):
+            second_value = second_value(initial_subject)
+        if self._operation is None:
             return first_value
-        return self.__operation(first_value, second_value)
+        result = self._operation(first_value, second_value)
+        return result
 
-    @staticmethod
-    def __get_subject_attr(subject, path):
+    @classmethod
+    def __get_subject_attr(cls, subject, path):
         if isinstance(subject, dict):
             subject = subject.get(path, None)
+        elif isinstance(subject, list):
+            subject = cls.__join_attr_list_values(subject, path)
         else:
             subject = getattr(subject, path, None)
         return subject
 
+    @classmethod
+    def __join_attr_list_values(cls, subject, path):
+        result = []
+        for item in subject:
+            result.append(cls.__get_subject_attr(item, path))
+        return result
+
     def __get_subject_value(self, subject):
-        if type(self.__attr_path) is list:
-            for path in self.__attr_path:
-                subject = self.__get_subject_attr(subject, path)
-                if subject is None:
-                    break
-        else:
-            subject = self.__get_subject_attr(subject, self.__attr_path)
+        for path in self._attr_path:
+            subject = self.__get_subject_attr(subject, path)
         return subject
 
     def __set_operation(self, operation: Tuple[Operator, Any]):
         if isinstance(operation[1], Rule):
-            self.__first_value = Rule(
-                attr_path=self.__attr_path,
-                first_value=self.__first_value,
-                operation=self.__operation,
-                second_value=self.__second_value
+            self._first_value = Rule(
+                *self._attr_path,
+                first_value=self._first_value,
+                operation=self._operation,
+                second_value=self._second_value
             )
-            self.__attr_path = ''
-        elif self.__operation:
+            self.__attr_path = []
+        elif self._operation:
             raise ValueError('You cannot set more than one operation to rule')
-        self.__operation = Operation(operation[0])
-        self.__second_value = operation[1]
+        self._operation = Operation(operation[0])
+        self._second_value = operation[1]
 
     def __and__(self, other) -> 'Rule':
         self.__set_operation((Operator.AND, other))
