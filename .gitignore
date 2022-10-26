@@ -4,6 +4,7 @@
 dist
 .DS_Store
 .idea
+.pytest_cache
 __pycache__/
 logs
 *.py[cod]
